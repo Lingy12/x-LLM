@@ -3,20 +3,20 @@ DATASET=$2
 METHOD=${3:-"finetune"}
 
 PORT=$(( $RANDOM % 1000 + 32768 ))
-CPFS_PATH=/home/user
-PROJECT_PATH=$CPFS_PATH/project/mt_instruction_tuning
+CPFS_PATH=/home/geyu
+PROJECT_PATH=$CPFS_PATH/projects/multi-lang/x-LLM
 OUTPUT_NAME=$BASE_MODEL.$DATASET.$METHOD
 
 export HF_HOME=$CPFS_PATH/.cache/huggingface
 export WANDB_API_KEY="1fdc13c0384782e379b1e9200ac13fff7c1a92a7"
 export WANDB_PROJECT="mt_instruction_tuning"
 export WANDB_NAME=$OUTPUT_NAME
-export WANDB_NOTES="FSDP on 8 A100"
+export WANDB_NOTES="FSDP on 4 A100 40"
 export WANDB_DIR="$CPFS_PATH/log"
 
 MODEL_ARGS=()
 case $BASE_MODEL in  
-	"llama-7b-hf")
+	"llama-2-7b-hf")
 		MODEL_ARGS+=("--num_train_epochs 3")
 		MODEL_ARGS+=("--learning_rate 2e-5")
         FSDP="full_shard auto_wrap"
@@ -46,9 +46,9 @@ case $METHOD in
 		;;  
 esac
 
-source $CPFS_PATH/miniconda3/bin/activate $PROJECT_PATH/.env
+# source $CPFS_PATH/miniconda3/bin/activate $PROJECT_PATH/.env
 
-torchrun --nproc_per_node=8 --master_port=$PORT \
+torchrun --nproc_per_node=3 --master_port=$PORT \
     $PROJECT_PATH/train.py \
 	${METHOD_ARGS[@]} \
 	${MODEL_ARGS[@]} \
@@ -58,9 +58,15 @@ torchrun --nproc_per_node=8 --master_port=$PORT \
     --fsdp "$FSDP" \
     --bf16 True \
     --tf32 True \
-    --per_device_train_batch_size 4 \
-    --per_device_eval_batch_size 4 \
-    --gradient_accumulation_steps 4 \
+    --per_device_train_batch_size 1 \
+    --per_device_eval_batch_size 1 \
+    --gradient_accumulation_steps 16 \
+    --lora_r 8 \
+    --lora_alpha 16 \
+    --lora_dropout 0.05 \
+    --lora_target_modules "[q_proj,v_proj]" \
+    --lora_bias 'none'\
+    --lora_task '"CAUSAL_LM"'\
     --lr_scheduler_type "cosine" \
     --weight_decay 0. \
     --warmup_ratio 0.03 \

@@ -21,6 +21,8 @@ import torch
 import transformers
 import utils
 from torch.utils.data import Dataset
+from peft import LoraConfig, get_peft_model, get_peft_model_state_dict,prepare_model_for_int8_training,set_peft_model_state_dict
+from typing import List
 from transformers import Trainer
 
 IGNORE_INDEX = -100
@@ -60,7 +62,12 @@ class TrainingArguments(transformers.TrainingArguments):
         default=512,
         metadata={"help": "Maximum sequence length. Sequences will be right padded (and possibly truncated)."},
     )
-
+    lora_r:int = field(default=8)
+    lora_alpha:int = field(default=16)
+    lora_dropout:float = field(default=0.05)
+    lora_target_modules: str = field(default='["q_proj", "v_proj"]')
+    lora_bias: str = field(default='none')
+    lora_task: str = field(default='CAUSAL_LM')
 
 def smart_tokenizer_and_embedding_resize(
     special_tokens_dict: Dict,
@@ -182,12 +189,21 @@ def make_supervised_data_module(tokenizer: transformers.PreTrainedTokenizer, dat
 def train():
     parser = transformers.HfArgumentParser((ModelArguments, DataArguments, TrainingArguments))
     model_args, data_args, training_args = parser.parse_args_into_dataclasses()
-
+    # print(training_args.lora_target_modules)
     model = transformers.AutoModelForCausalLM.from_pretrained(
         model_args.model_name_or_path,
         cache_dir=training_args.cache_dir,
+        load_in_8bit=True
     )
-
+    config = LoraConfig(
+       r=training_args.lora_r,
+        lora_alpha=training_args.lora_alpha,
+        target_modules= [item.strip() for item in training_args.lora_target_modules.strip("[]").split(",")],
+        lora_dropout=training_args.lora_dropout,
+        bias=training_args.lora_bias,
+        task_type=training_args.lora_task
+    )
+   
     tokenizer = transformers.AutoTokenizer.from_pretrained(
         model_args.model_name_or_path,
         cache_dir=training_args.cache_dir,
@@ -195,6 +211,8 @@ def train():
         padding_side="right",
         use_fast=False,
     )
+    
+    model = get_peft_model(model, config)
     special_tokens_dict = dict()
     if tokenizer.pad_token is None:
         special_tokens_dict["pad_token"] = DEFAULT_PAD_TOKEN
