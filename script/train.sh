@@ -1,3 +1,4 @@
+export CUDA_VISIBLE_DEVICES='2,3'
 BASE_MODEL=$1
 DATASET=$2
 METHOD=${3:-"finetune"}
@@ -20,7 +21,7 @@ case $BASE_MODEL in
 	"llama-2-7b-hf")
 		MODEL_ARGS+=("--num_train_epochs 3")
 		MODEL_ARGS+=("--learning_rate 2e-5")
-        FSDP="full_shard offload auto_wrap"
+        FSDP="full_shard auto_wrap"
 		;;  
 	"llama-13b-hf")
 		MODEL_ARGS+=("--num_train_epochs 5")
@@ -48,19 +49,18 @@ case $METHOD in
 esac
 
 # source $CPFS_PATH/miniconda3/bin/activate $PROJECT_PATH/.env
-
-torchrun --nproc_per_node=4 --master_port=$PORT \
+echo "Start training"
+# assume batch 128
+torchrun --nproc_per_node=2 --master_port=$PORT \
     $PROJECT_PATH/train.py \
 	${METHOD_ARGS[@]} \
 	${MODEL_ARGS[@]} \
     --data_path "$PROJECT_PATH/data/$DATASET" \
     --model_name_or_path "$PROJECT_PATH/model/$BASE_MODEL" \
     --output_dir "$PROJECT_PATH/model/$OUTPUT_NAME" \
-    --fsdp "$FSDP" \
-    --fsdp_config "$FSDP_CONFIG" \
-    --fp16 True \
-    --per_device_train_batch_size 1 \
-    --per_device_eval_batch_size 1 \
+    --bf16 True \
+    --per_device_train_batch_size 4 \
+    --per_device_eval_batch_size 4 \
     --gradient_accumulation_steps 16 \
     --lora_r 8\
     --lora_alpha 16 \
@@ -76,6 +76,8 @@ torchrun --nproc_per_node=4 --master_port=$PORT \
     --save_steps 2000 \
     --save_total_limit 1 \
     --load_best_model_at_end True \
+    --model_max_length 512\
+    --optim "adamw_torch" \
     --logging_steps 1 \
     --report_to wandb tensorboard \
     --remove_unused_columns False \

@@ -189,11 +189,12 @@ def make_supervised_data_module(tokenizer: transformers.PreTrainedTokenizer, dat
 def train():
     parser = transformers.HfArgumentParser((ModelArguments, DataArguments, TrainingArguments))
     model_args, data_args, training_args = parser.parse_args_into_dataclasses()
-    # print(training_args.lora_target_modules)
     model = transformers.AutoModelForCausalLM.from_pretrained(
         model_args.model_name_or_path,
         cache_dir=training_args.cache_dir,
+        torch_dtype=torch.bfloat16 # add float 16 
     )
+
     config = LoraConfig(
        r=training_args.lora_r,
         lora_alpha=training_args.lora_alpha,
