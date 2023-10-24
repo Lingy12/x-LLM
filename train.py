@@ -149,7 +149,7 @@ class SupervisedDataset(Dataset):
 
         logging.warning("Tokenizing inputs... This may take some time...")
         data_dict = preprocess(sources, targets, tokenizer)
-
+        logging.warning('Finished tokenization')
         self.input_ids = data_dict["input_ids"]
         self.labels = data_dict["labels"]
 
@@ -193,7 +193,6 @@ def train():
     model = transformers.AutoModelForCausalLM.from_pretrained(
         model_args.model_name_or_path,
         cache_dir=training_args.cache_dir,
-        load_in_8bit=True
     )
     config = LoraConfig(
        r=training_args.lora_r,
@@ -203,7 +202,7 @@ def train():
         bias=training_args.lora_bias,
         task_type=training_args.lora_task
     )
-   
+    
     tokenizer = transformers.AutoTokenizer.from_pretrained(
         model_args.model_name_or_path,
         cache_dir=training_args.cache_dir,
@@ -213,6 +212,8 @@ def train():
     )
     
     model = get_peft_model(model, config)
+
+    model.print_trainable_parameters()
     special_tokens_dict = dict()
     if tokenizer.pad_token is None:
         special_tokens_dict["pad_token"] = DEFAULT_PAD_TOKEN

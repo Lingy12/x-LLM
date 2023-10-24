@@ -6,9 +6,10 @@ PORT=$(( $RANDOM % 1000 + 32768 ))
 CPFS_PATH=/home/geyu
 PROJECT_PATH=$CPFS_PATH/projects/multi-lang/x-LLM
 OUTPUT_NAME=$BASE_MODEL.$DATASET.$METHOD
+FSDP_CONFIG=$PROJECT_PATH/fsdp_conf.json
 
 export HF_HOME=$CPFS_PATH/.cache/huggingface
-export WANDB_API_KEY="1fdc13c0384782e379b1e9200ac13fff7c1a92a7"
+export WANDB_API_KEY="450f5f137524092429c1579743d3941e8d31ac5d"
 export WANDB_PROJECT="mt_instruction_tuning"
 export WANDB_NAME=$OUTPUT_NAME
 export WANDB_NOTES="FSDP on 4 A100 40"
@@ -19,7 +20,7 @@ case $BASE_MODEL in
 	"llama-2-7b-hf")
 		MODEL_ARGS+=("--num_train_epochs 3")
 		MODEL_ARGS+=("--learning_rate 2e-5")
-        FSDP="full_shard auto_wrap"
+        FSDP="full_shard offload auto_wrap"
 		;;  
 	"llama-13b-hf")
 		MODEL_ARGS+=("--num_train_epochs 5")
@@ -48,7 +49,7 @@ esac
 
 # source $CPFS_PATH/miniconda3/bin/activate $PROJECT_PATH/.env
 
-torchrun --nproc_per_node=3 --master_port=$PORT \
+torchrun --nproc_per_node=4 --master_port=$PORT \
     $PROJECT_PATH/train.py \
 	${METHOD_ARGS[@]} \
 	${MODEL_ARGS[@]} \
@@ -56,15 +57,15 @@ torchrun --nproc_per_node=3 --master_port=$PORT \
     --model_name_or_path "$PROJECT_PATH/model/$BASE_MODEL" \
     --output_dir "$PROJECT_PATH/model/$OUTPUT_NAME" \
     --fsdp "$FSDP" \
-    --bf16 True \
-    --tf32 True \
+    --fsdp_config "$FSDP_CONFIG" \
+    --fp16 True \
     --per_device_train_batch_size 1 \
     --per_device_eval_batch_size 1 \
     --gradient_accumulation_steps 16 \
-    --lora_r 8 \
+    --lora_r 8\
     --lora_alpha 16 \
     --lora_dropout 0.05 \
-    --lora_target_modules "[q_proj,v_proj]" \
+    --lora_target_modules "[q_proj, v_proj]" \
     --lora_bias 'none'\
     --lora_task '"CAUSAL_LM"'\
     --lr_scheduler_type "cosine" \
@@ -77,4 +78,6 @@ torchrun --nproc_per_node=3 --master_port=$PORT \
     --load_best_model_at_end True \
     --logging_steps 1 \
     --report_to wandb tensorboard \
+    --remove_unused_columns False \
     --logging_dir "$CPFS_PATH/log/tensorboard/$OUTPUT_NAME"
+
