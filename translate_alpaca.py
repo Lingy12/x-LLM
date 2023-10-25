@@ -13,7 +13,8 @@ def translate_alpaca(target):
     translated_alpaca = []
     for entry in tqdm(alpaca_ds):
         success = False
-        while not success:
+        retry_count = 0
+        while not success and retry_count < 10:
             try:
                 new_entry = {}
                 for key in entry.keys():
@@ -26,6 +27,9 @@ def translate_alpaca(target):
             except Exception as e:
                 time.sleep(1)
                 success=False
+                retry_count += 1
+        if not success:
+            raise Exception('Cannot translate {} after retrying with {}'.format(entry, e))
     
     assert len(translate_alpaca) == len(alpaca_ds)
 
