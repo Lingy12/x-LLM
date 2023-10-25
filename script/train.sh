@@ -1,7 +1,11 @@
-export CUDA_VISIBLE_DEVICES='2,3'
 BASE_MODEL=$1
 DATASET=$2
-METHOD=${3:-"finetune"}
+CUDA_DEVICES=$3
+NUM_PROC=$4
+METHOD=${5:-"finetune"}
+
+# ensure number of CUDA_DEVICES is more than NUM_PROC
+export CUDA_VISIBLE_DEVICES=$CUDA_DEVICES
 
 PORT=$(( $RANDOM % 1000 + 32768 ))
 CPFS_PATH=/home/geyu
@@ -51,7 +55,7 @@ esac
 # source $CPFS_PATH/miniconda3/bin/activate $PROJECT_PATH/.env
 echo "Start training"
 # assume batch 128
-torchrun --nproc_per_node=2 --master_port=$PORT \
+torchrun --nproc_per_node=$NUM_PROC --master_port=$PORT \
     $PROJECT_PATH/train.py \
 	${METHOD_ARGS[@]} \
 	${MODEL_ARGS[@]} \
