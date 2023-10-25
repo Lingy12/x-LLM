@@ -24,7 +24,7 @@ def translate_alpaca(target):
                 translated_alpaca.append(new_entry)
                 success = True
             except Exception as e:
-                print('retrying')
+                # print('retrying')
                 success=False
     
     assert len(translate_alpaca) == len(alpaca_ds)
