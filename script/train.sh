@@ -59,9 +59,9 @@ torchrun --nproc_per_node=2 --master_port=$PORT \
     --model_name_or_path "$PROJECT_PATH/model/$BASE_MODEL" \
     --output_dir "$PROJECT_PATH/model/$OUTPUT_NAME" \
     --bf16 True \
-    --per_device_train_batch_size 4 \
-    --per_device_eval_batch_size 4 \
-    --gradient_accumulation_steps 16 \
+    --per_device_train_batch_size 2 \
+    --per_device_eval_batch_size 2 \
+    --gradient_accumulation_steps 32 \
     --lora_r 8\
     --lora_alpha 16 \
     --lora_dropout 0.05 \
