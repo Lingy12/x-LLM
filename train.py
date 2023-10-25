@@ -235,7 +235,10 @@ def train():
     trainer = Trainer(model=model, tokenizer=tokenizer, args=training_args, **data_module)
     trainer.train()
     trainer.save_state()
-    trainer.save_model(output_dir=training_args.output_dir)
+    model = trainer.model
+    model = model.merge_and_unload()
+    model = model.save_pretrained(save_directory=training_args.output_dir)
+    # trainer.save_model(output_dir=training_args.output_dir)
 
 
 if __name__ == "__main__":
