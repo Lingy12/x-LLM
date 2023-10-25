@@ -15,7 +15,7 @@ FSDP_CONFIG=$PROJECT_PATH/fsdp_conf.json
 
 export HF_HOME=$CPFS_PATH/.cache/huggingface
 export WANDB_API_KEY="450f5f137524092429c1579743d3941e8d31ac5d"
-export WANDB_PROJECT="mt_instruction_tuning"
+export WANDB_PROJECT="multilang_instruction_tuning"
 export WANDB_NAME=$OUTPUT_NAME
 export WANDB_NOTES="FSDP on 4 A100 40"
 export WANDB_DIR="$CPFS_PATH/log"
