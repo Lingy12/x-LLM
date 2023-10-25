@@ -2,7 +2,7 @@ import fire
 import json
 import googletrans
 from tqdm import tqdm
-
+import time 
 translator = googletrans.Translator()
 ALPACA_PATH = './data/alpaca/alpaca_en.json'
 
@@ -17,14 +17,14 @@ def translate_alpaca(target):
             try:
                 new_entry = {}
                 for key in entry.keys():
-                    if len(entry[key]) == 0:
+                    if len(entry[key]) == 0 or not entry[key]:
                         new_entry[key] = entry[key]
                     else:
                         new_entry[key] = translator.translate(entry[key], dest=target).text
                 translated_alpaca.append(new_entry)
                 success = True
             except Exception as e:
-                # print('retrying')
+                time.sleep(1)
                 success=False
     
     assert len(translate_alpaca) == len(alpaca_ds)
