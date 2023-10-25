@@ -11,6 +11,8 @@ translator = googletrans.Translator()
 
 def translate_sentence(args):
     sentence, target = args
+    if len(sentence) == 0:
+        return sentence
     success = False
     retry_count = 0
     result = None
@@ -21,7 +23,7 @@ def translate_sentence(args):
         except:
             retry_count += 1
             time.sleep(2)
-    if not success:
+    if result is None:
         raise Exception('Cannot translate some of the sentence')
     return result
 
@@ -39,15 +41,18 @@ def translate_ncwm(target:str, num_workers:int=4):
     with open(ori_file, 'r') as f:
         lines = f.readlines()
 
-    params = list(map(lambda x: (x, target), lines))
+    params = list(map(lambda x: (x.strip(), target), lines))
 
     with mp.Pool(num_workers) as p:
         results = list(tqdm(p.imap(translate_sentence, params), total=len(params)))
     
     output_file = os.path.join(new_target_path, f'train.{target}')
+
+    if os.path.exists(output_file):
+        os.remove(output_file)
     with open(output_file, 'a') as f:
         for res in results:
-            if not res:
+            if res is None:
                 raise Exception('Some not translated')
             f.write(res + "\n")
 
