@@ -111,7 +111,7 @@ class MLQA(datasets.GeneratorBasedBuilder):
 
     def _split_generators(self, dl_manager):
         return [
-            datasets.SplitGenerator(name=datasets.Split.TEST, gen_kwargs={"filepath": os.path.join(self.base_path, f"test-context-{self.config.lang}-question-{self.config.lang}.json")}),
+            datasets.SplitGenerator(name=datasets.Split.TEST, gen_kwargs={"filepath": os.path.join(self.base_path, f"dev-context-{self.config.lang}-question-{self.config.lang}.json")}),
         ]
 
     def _generate_examples(self, filepath):
