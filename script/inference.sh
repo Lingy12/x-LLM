@@ -2,8 +2,8 @@ MODEL_NAME=$1
 DATASET=$2
 BATCH=${3:-8}
 
-CPFS_PATH=/home/user
-PROJECT_PATH=$CPFS_PATH/project/mt_instruction_tuning
+CPFS_PATH=/home/geyu
+PROJECT_PATH=$CPFS_PATH/projects/multi-lang/x-LLM
 
 export HF_HOME=$CPFS_PATH/.cache/huggingface
 
