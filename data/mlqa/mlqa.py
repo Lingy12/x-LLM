@@ -15,12 +15,12 @@
 
 # Lint as: python3
 
-# THIS DATASET USES LANGUAGE SPECIFIC INSTRUCTION
-
 import os
 import json
 import datasets
 logger = datasets.logging.get_logger(__name__)
+
+# THIS DATASET USES LANGUAGE SPECIFIC INSTRUCTION
 
 _INSTRUCTIONS = {
 "ar": "الرجاء الإجابة على الأسئلة بناءً على الفقرات التالية",
@@ -74,31 +74,28 @@ Contexto: {context}
 Pregunta: {}
 Respuesta: """,
 }
+
 _CITATION = """\
-@article{Artetxe:etal:2019,
-      author    = {Mikel Artetxe and Sebastian Ruder and Dani Yogatama},
-      title     = {On the cross-lingual transferability of monolingual representations},
-      journal   = {CoRR},
-      volume    = {abs/1910.11856},
-      year      = {2019},
-      archivePrefix = {arXiv},
-      eprint    = {1910.11856}
+@article{lewis2019mlqa,
+  title={MLQA: Evaluating Cross-lingual Extractive Question Answering},
+  author={Lewis, Patrick and Oguz, Barlas and Rinott, Ruty and Riedel, Sebastian and Schwenk, Holger},
+  journal={arXiv preprint arXiv:1910.07475},
+  year={2019}
 }
 """
 
 _DESCRIPTION = """\
-XQuAD (Cross-lingual Question Answering Dataset) is a benchmark dataset for evaluating cross-lingual question answering
-performance. The dataset consists of a subset of 240 paragraphs and 1190 question-answer pairs from the development set
-of SQuAD v1.1 (Rajpurkar et al., 2016) together with their professional translations into ten languages: Spanish, German,
-Greek, Russian, Turkish, Arabic, Vietnamese, Thai, Chinese, Hindi and Romanian. Consequently, the dataset is entirely parallel
-across 12 languages.
+MLQA (MultiLingual Question Answering) is a benchmark dataset for evaluating cross-lingual question answering performance.
+MLQA consists of over 5K extractive QA instances (12K in English) in SQuAD format in seven languages - English, Arabic,
+German, Spanish, Hindi, Vietnamese and Simplified Chinese. MLQA is highly parallel, with QA instances parallel between
+4 different languages on average.
 """
 
-_LANG = ["ar", "de", "zh", "vi", "en", "es", "hi", "el", "th", "tr", "ru", "ro"]
+_LANG = ["ar", "de", "zh", "vi", "en", "es", "hi"]
 
-class XquadConfig(datasets.BuilderConfig):
+class MLQAConfig(datasets.BuilderConfig):
 
-    """BuilderConfig for Xquad"""
+    """BuilderConfig for MLQA"""
 
     def __init__(self, config: str, **kwargs):
         """
@@ -106,15 +103,14 @@ class XquadConfig(datasets.BuilderConfig):
             lang: string, language for the input text
             **kwargs: keyword arguments forwarded to super.
         """
-        super(XquadConfig, self).__init__(**kwargs)
+        super(MLQAConfig, self).__init__(**kwargs)
         self.lang = config
 
 
-class Xquad(datasets.GeneratorBasedBuilder):
-    """This is an adapter for loading raw text parallel corpus."""
+class MLQA(datasets.GeneratorBasedBuilder):
     VERSION = datasets.Version("1.0.0")
-    BUILDER_CONFIGS = [XquadConfig(config=lang, name=f"xquad_{lang}") for lang in _LANG]
-    BUILDER_CONFIG_CLASS = XquadConfig
+    BUILDER_CONFIGS = [MLQAConfig(config=lang, name=f"mlqa_{lang}") for lang in _LANG]
+    BUILDER_CONFIG_CLASS = MLQAConfig
 
     def _info(self):
         return datasets.DatasetInfo(
@@ -127,23 +123,23 @@ class Xquad(datasets.GeneratorBasedBuilder):
                     "output": datasets.Value("string"),
                 }
             ),
-            homepage="https://github.com/deepmind/xquad",
+            homepage="https://github.com/facebookresearch/MLQA",
             citation=_CITATION,
         )
 
     def _split_generators(self, dl_manager):
         return [
-            datasets.SplitGenerator(name=datasets.Split.TEST, gen_kwargs={"filepath": os.path.join(self.base_path, f"xquad.{self.config.lang}.json")}),
+            datasets.SplitGenerator(name=datasets.Split.TEST, gen_kwargs={"filepath": os.path.join(self.base_path, f"test-context-{self.config.lang}-question-{self.config.lang}.json")}),
         ]
 
     def _generate_examples(self, filepath):
         """This function returns the examples in the raw (text) form."""
-        logger.info("[xquad] generating examples from = %s", filepath)
+        logger.info("[mlqa] generating examples from = %s", filepath)
         
         with open(filepath, encoding="utf-8") as f:
-            xquad = json.load(f)
+            mlqa = json.load(f)
             id_ = 0
-            for article in xquad["data"]:
+            for article in mlqa["data"]:
                 for paragraph in article["paragraphs"]:
                     context = paragraph["context"].strip()
                     for qa in paragraph["qas"]:
