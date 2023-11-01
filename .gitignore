@@ -137,3 +137,5 @@ dump
 log
 export
 .vscode
+
+data_raw/
