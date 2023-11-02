@@ -74,6 +74,7 @@ class Platypus(datasets.GeneratorBasedBuilder):
                     "instruction": datasets.Value("string"),
                     "input": datasets.Value("string"),
                     "output": datasets.Value("string"),
+                    "id": datasets.Value("string")
                 }
             ),
             homepage="https://github.com/tatsu-lab/stanford_alpaca",
