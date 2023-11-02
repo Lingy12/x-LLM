@@ -2,7 +2,8 @@ BASE_MODEL=$1
 DATASET=$2
 CUDA_DEVICES=$3
 NUM_PROC=$4
-METHOD=${5:-"finetune"}
+PROMPT_NAME=$5
+METHOD=${6:-"finetune"}
 
 # ensure number of CUDA_DEVICES is more than NUM_PROC
 export CUDA_VISIBLE_DEVICES=$CUDA_DEVICES
@@ -10,7 +11,7 @@ export CUDA_VISIBLE_DEVICES=$CUDA_DEVICES
 PORT=$(( $RANDOM % 1000 + 32768 ))
 CPFS_PATH=/home/geyu
 PROJECT_PATH=$CPFS_PATH/projects/multi-lang/x-LLM
-OUTPUT_NAME=$BASE_MODEL.$DATASET.$METHOD
+OUTPUT_NAME=$BASE_MODEL.$DATASET.$METHOD.$PROMPT_NAME
 FSDP_CONFIG=$PROJECT_PATH/fsdp_conf.json
 
 export HF_HOME=$CPFS_PATH/.cache/huggingface
@@ -85,5 +86,6 @@ torchrun --nproc_per_node=$NUM_PROC --master_port=$PORT \
     --logging_steps 1 \
     --report_to wandb tensorboard \
     --remove_unused_columns False \
-    --logging_dir "$CPFS_PATH/log/tensorboard/$OUTPUT_NAME"
+    --logging_dir "$CPFS_PATH/log/tensorboard/$OUTPUT_NAME" \
+    --prompt_name "$PROMPT_NAME"
 

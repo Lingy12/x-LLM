@@ -25,6 +25,7 @@ def translate_entry(args):
             success = True
         except Exception as e:
             time.sleep(1)
+            print(e)
             success=False
             retry_count += 1
     if not success:
@@ -47,7 +48,7 @@ def translate_alpaca(target, num_workers=4):
     translated_alpaca = results
     assert len(translated_alpaca) == len(alpaca_ds)
 
-    with open(f'./data/alpaca/alpaca_{target}.json', 'w') as f:
+    with open(f'./data/platypus/platypus_{target}.json', 'w') as f:
         json.dump(translated_alpaca, f, indent=1)
 
 if __name__ == '__main__':

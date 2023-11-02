@@ -24,24 +24,13 @@ from torch.utils.data import Dataset
 from peft import LoraConfig, get_peft_model, get_peft_model_state_dict,prepare_model_for_int8_training,set_peft_model_state_dict
 from typing import List
 from transformers import Trainer
+from config import prompts
 
 IGNORE_INDEX = -100
 DEFAULT_PAD_TOKEN = "<pad>"
 DEFAULT_EOS_TOKEN = "</s>"
 DEFAULT_BOS_TOKEN = "<s>"
 DEFAULT_UNK_TOKEN = "<unk>"
-PROMPT_DICT = {
-    "prompt_input": (
-        "Below is an instruction that describes a task, paired with an input that provides further context. "
-        "Write a response that appropriately completes the request.\n\n"
-        "### Instruction:\n{instruction}\n\n### Input:\n{input}\n\n### Response:"
-    ),
-    "prompt_no_input": (
-        "Below is an instruction that describes a task. "
-        "Write a response that appropriately completes the request.\n\n"
-        "### Instruction:\n{instruction}\n\n### Response:"
-    ),
-}
 
 
 @dataclass
@@ -68,6 +57,7 @@ class TrainingArguments(transformers.TrainingArguments):
     lora_target_modules: str = field(default='["q_proj", "v_proj"]')
     lora_bias: str = field(default='none')
     lora_task: str = field(default='CAUSAL_LM')
+    prompt_name: str = field(default='alpaca_prompt')
 
 def smart_tokenizer_and_embedding_resize(
     special_tokens_dict: Dict,
@@ -134,11 +124,11 @@ def preprocess(
 class SupervisedDataset(Dataset):
     """Dataset for supervised fine-tuning."""
 
-    def __init__(self, data_path: str, tokenizer: transformers.PreTrainedTokenizer):
+    def __init__(self, data_path: str, tokenizer: transformers.PreTrainedTokenizer, prompt_name:str):
         super(SupervisedDataset, self).__init__()
         logging.warning("Loading data...")
         list_data_dict = list(utils.load_datasets(data_path))
-
+        PROMPT_DICT = getattr(prompts, prompt_name) # Get the prompt
         logging.warning("Formatting inputs...")
         prompt_input, prompt_no_input = PROMPT_DICT["prompt_input"], PROMPT_DICT["prompt_no_input"]
         sources = [
@@ -179,9 +169,9 @@ class DataCollatorForSupervisedDataset(object):
         )
 
 
-def make_supervised_data_module(tokenizer: transformers.PreTrainedTokenizer, data_args) -> Dict:
+def make_supervised_data_module(tokenizer: transformers.PreTrainedTokenizer, prompt_name:str, data_args) -> Dict:
     """Make dataset and collator for supervised fine-tuning."""
-    train_dataset = SupervisedDataset(tokenizer=tokenizer, data_path=data_args.data_path)
+    train_dataset = SupervisedDataset(tokenizer=tokenizer, prompt_name=prompt_name, data_path=data_args.data_path)
     data_collator = DataCollatorForSupervisedDataset(tokenizer=tokenizer)
     return dict(train_dataset=train_dataset, eval_dataset=None, data_collator=data_collator)
 
@@ -231,7 +221,11 @@ def train():
         model=model,
     )
 
-    data_module = make_supervised_data_module(tokenizer=tokenizer, data_args=data_args)
+    if not training_args.prompt_name:
+        raise Exception('Please specify prompt name')
+    if training_args.prompt_name not in prompts.__name__:
+        raise Exception('Please use a named prompt. See config/prompts')
+    data_module = make_supervised_data_module(tokenizer=tokenizer, prompt_name=training_args.prompt_name, data_args=data_args)
     trainer = Trainer(model=model, tokenizer=tokenizer, args=training_args, **data_module)
     trainer.train()
     trainer.save_state()
