@@ -8,6 +8,11 @@ import multiprocessing as mp
 translator=googletrans.Translator()
 import time
 
+def unpack_translation(translate_result): 
+    if isinstance(translate_result, list):
+        return list(map(lambda x: x.text, translate_result))
+    else:
+        return translate_result.text
 def translate_entry(args):
     entry, target = args
     success = False
@@ -20,10 +25,12 @@ def translate_entry(args):
                 if len(entry[key]) == 0 or not entry[key]:
                     new_entry[key] = entry[key]
                 else:
-                    new_entry[key] = translator.translate(entry[key], dest=target).text
+                    new_entry[key] = unpack_translation(translator.translate(entry[key], dest=target))
             success = True
         except Exception as e:
+            # print(translator.translate(entry[key], dest=target)[0].extra_data)
             time.sleep(1)
+            print(e)
             success=False
             retry_count += 1
     if not success:
