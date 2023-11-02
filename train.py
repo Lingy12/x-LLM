@@ -223,7 +223,10 @@ def train():
 
     if not training_args.prompt_name:
         raise Exception('Please specify prompt name')
-    if training_args.prompt_name not in prompts.__name__:
+    
+    try:
+        getattr(prompts, training_args.prompt_name)
+    except:
         raise Exception('Please use a named prompt. See config/prompts')
     data_module = make_supervised_data_module(tokenizer=tokenizer, prompt_name=training_args.prompt_name, data_args=data_args)
     trainer = Trainer(model=model, tokenizer=tokenizer, args=training_args, **data_module)
