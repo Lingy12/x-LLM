@@ -1,12 +1,19 @@
 BASE_MODEL=$1
 DATASET=$2
-CUDA_DEVICES=$3
-NUM_PROC=$4
-PROMPT_NAME=$5
-METHOD=${6:-"finetune"}
-
+# CUDA_DEVICES=$3
+NUM_PROC=$3
+MICRO_BATCH_SIZE=$4
+MACRO_BATCH_SIZE=$5
+PROMPT_NAME=$6
+METHOD=${7:-"finetune"}
 # ensure number of CUDA_DEVICES is more than NUM_PROC
-export CUDA_VISIBLE_DEVICES=$CUDA_DEVICES
+# export CUDA_VISIBLE_DEVICES=$CUDA_DEVICES
+
+ACCUMULATION_STEP=$(expr $MACRO_BATCH_SIZE / $MICRO_BATCH_SIZE / $NUM_PROC)
+
+echo "MICRO_BATCH_SIZE=$MICRO_BATCH_SIZE"
+echo "MACRO_BATCH_SIZE=$MACRO_BATCH_SIZE"
+echo "GRADIENT_ACCUMULATION_STEP=$ACCUMULATION_STEP"
 
 PORT=$(( $RANDOM % 1000 + 32768 ))
 CPFS_PATH=/home/geyu
@@ -64,9 +71,9 @@ torchrun --nproc_per_node=$NUM_PROC --master_port=$PORT \
     --model_name_or_path "$PROJECT_PATH/model/$BASE_MODEL" \
     --output_dir "$PROJECT_PATH/model/$OUTPUT_NAME" \
     --bf16 True \
-    --per_device_train_batch_size 2 \
-    --per_device_eval_batch_size 2 \
-    --gradient_accumulation_steps 32 \
+    --per_device_train_batch_size "$MICRO_BATCH_SIZE" \
+    --per_device_eval_batch_size "$MICRO_BATCH_SIZE" \
+    --gradient_accumulation_steps $ACCUMULATION_STEP \
     --lora_r 8\
     --lora_alpha 16 \
     --lora_dropout 0.05 \
