@@ -37,7 +37,7 @@ def translate(source, target_lang, output_path, num_workers=4):
 
     translated = []
     params = []
-    for entry in alpaca_ds:
+    for entry in ds:
         params.append((entry, target_lang))
     
     with mp.Pool(num_workers) as p:
