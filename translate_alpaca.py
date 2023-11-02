@@ -45,8 +45,8 @@ def translate_alpaca(target, num_workers=4):
     translated_alpaca = results
     assert len(translated_alpaca) == len(alpaca_ds)
 
-    with open(f'./data/alpaca/alpaca_{target}.json', 'w') as f:
-        json.dump(translated_alpaca, f, indent=1)
+    with open(f'./data/alpaca/alpaca_{target}.json', 'w', encoding='utf-8') as f:
+        json.dump(translated_alpaca, f, indent=1, ensure_ascii=False)
 
 if __name__ == '__main__':
     fire.Fire(translate_alpaca)
