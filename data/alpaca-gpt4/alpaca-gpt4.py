@@ -93,5 +93,6 @@ class Alpaca(datasets.GeneratorBasedBuilder):
             alpaca = json.load(f)
             id_ = 0
             for sample in alpaca:
+                del sample['text']
                 yield id_, sample | {"id": id_}
                 id_ += 1
