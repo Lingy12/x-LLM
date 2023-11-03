@@ -33,9 +33,6 @@ echo "Virtual environment activated"
 #################################################
 cd {{script_dir}}
 
-HOME_PATH=$7
-XLLM_PATH=$8
-PROJECT_NAME=$9
 bash script/train.sh {{model_name}} {{dataset_conf}} {{ngpu}} 2 128 {{prompt}} {{home_path}} {{xllm_path}} {{project_name}}
 #################################################
 #################################################
