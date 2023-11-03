@@ -139,3 +139,4 @@ export
 .vscode
 
 data_raw/
+generation_history.sh

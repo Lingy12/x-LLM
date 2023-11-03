@@ -18,6 +18,8 @@ def generate_jobs(data_group, dest_dir, gpu_num, home_path, xllm_path, project_n
     if not os.path.exists(dest_dir):
         os.mkdir(dest_dir)
     
+    if not os.path.exists(os.path.join(dest_dir, 'psb_runs/')):
+        os.mkdir(os.path.join(dest_dir, 'psb_runs/'))
     conf_group = getattr(job_config, data_group)
     params = itertools.product(conf_group['data'], conf_group['prompt'], conf_group['base_model'])
     params_required = get_place_holder(template)
