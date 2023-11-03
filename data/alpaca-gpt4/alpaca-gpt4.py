@@ -45,7 +45,7 @@ This produced an instruction-following dataset with 52K examples obtained at a m
 
 _LANG = ["en", "es", "vi", "zh"]
 
-class ShareGPTConfig(datasets.BuilderConfig):
+class AlpacaConfig(datasets.BuilderConfig):
 
     """BuilderConfig for Alpaca"""
 
@@ -55,25 +55,25 @@ class ShareGPTConfig(datasets.BuilderConfig):
             lang: string, language for the input text
             **kwargs: keyword arguments forwarded to super.
         """
-        super(ShareGPTConfig, self).__init__(**kwargs)
+        super(AlpacaConfig, self).__init__(**kwargs)
         self.lang = config
 
 
-class ShareGPT(datasets.GeneratorBasedBuilder):
+class Alpaca(datasets.GeneratorBasedBuilder):
     """This is an adapter for loading raw text parallel corpus."""
     VERSION = datasets.Version("1.0.0")
-    BUILDER_CONFIGS = [ShareGPTConfig(config=lang, name=f"sharegpt-clean_{lang}") for lang in _LANG]
-    BUILDER_CONFIG_CLASS = ShareGPTConfig
+    BUILDER_CONFIGS = [AlpacaConfig(config=lang, name=f"alpaca-gpt4_{lang}") for lang in _LANG]
+    BUILDER_CONFIG_CLASS = AlpacaConfig
 
     def _info(self):
         return datasets.DatasetInfo(
             description=_DESCRIPTION,
             features=datasets.Features(
                 {
+                    "id": datasets.Value("string"),
                     "instruction": datasets.Value("string"),
                     "input": datasets.Value("string"),
                     "output": datasets.Value("string"),
-                    "id": datasets.Value("string")
                 }
             ),
             homepage="https://github.com/tatsu-lab/stanford_alpaca",
@@ -82,18 +82,16 @@ class ShareGPT(datasets.GeneratorBasedBuilder):
 
     def _split_generators(self, dl_manager):
         return [
-            datasets.SplitGenerator(name=datasets.Split.TRAIN, gen_kwargs={"filepath": os.path.join(self.base_path, f"sharegpt-clean_{self.config.lang}.json")}),
+            datasets.SplitGenerator(name=datasets.Split.TRAIN, gen_kwargs={"filepath": os.path.join(self.base_path, f"alpaca-gpt4_{self.config.lang}.json")}),
         ]
 
     def _generate_examples(self, filepath):
         """This function returns the examples in the raw (text) form."""
-        logger.info("[sharegpt] generating examples from = %s", filepath)
+        logger.info("[alpaca] generating examples from = %s", filepath)
         
         with open(filepath, encoding="utf-8") as f:
             alpaca = json.load(f)
             id_ = 0
             for sample in alpaca:
-                sample['output'] = sample['target']
-                del sample['target']
                 yield id_, sample | {"id": id_}
                 id_ += 1
