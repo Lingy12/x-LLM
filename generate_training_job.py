@@ -14,7 +14,7 @@ def get_place_holder(template):
     placeholders = re.findall(r'{{(.*?)}}', template)
     return list(placeholders)
 
-def generate_jobs(data_group, dest_dir, gpu_num, wall_time=24):
+def generate_jobs(data_group, dest_dir, gpu_num, home_path, xllm_path, project_name, wall_time=24):
     if not os.path.exists(dest_dir):
         os.mkdir(dest_dir)
     
@@ -24,7 +24,8 @@ def generate_jobs(data_group, dest_dir, gpu_num, wall_time=24):
     
     for data, prompt, base_model in params:
         params = {"ngpu": str(gpu_num), "dataset_conf": str(data), "prompt":str(prompt), 
-                  "script_dir": os.getcwd(), "model_name": base_model, "wall_time": str(wall_time)}
+                  "script_dir": os.getcwd(), "model_name": base_model, "wall_time": str(wall_time), 
+                  "home_path": home_path, "xllm_path": xllm_path, "project_name":project_name}
         
         missing_key = set(params_required) - set(params.keys())
         if len(missing_key) == 0:
