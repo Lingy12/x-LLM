@@ -1,6 +1,6 @@
 import json
 from tqdm import tqdm
-with open('./data/sharegpt/90k_mix.json', 'r') as f:
+with open('./data/sharegpt/sharegpt-md.json', 'r') as f:
     data = json.load(f)
     
 id = 0

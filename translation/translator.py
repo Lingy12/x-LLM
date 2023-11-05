@@ -29,7 +29,7 @@ def translate_entry(args):
             success = True
         except Exception as e:
             # print(translator.translate(entry[key], dest=target)[0].extra_data)
-            time.sleep(1)
+            time.sleep(10)
             print(e)
             success=False
             retry_count += 1
