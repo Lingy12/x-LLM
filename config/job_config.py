@@ -1,4 +1,8 @@
-
+en_only_group = {
+        "base_model": ['llama-2-7b-hf'],
+        "data": ["sharegpt-clean_en", "platypus_en", "alpaca-gpt4_en"],
+        "prompt": ["general_prompt_no_sys"]
+        }
 
 platypus_group = {
     "base_model": ["llama-2-7b-hf"],

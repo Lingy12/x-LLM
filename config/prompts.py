@@ -12,6 +12,6 @@ alpaca_prompt = {
 }
 
 general_prompt_no_sys = {
-    "prompt_input": ("{instruction} {input} "),
-    "prompt_no_input": ("{instruction}")
+        "prompt_input": ("{instruction} Input: {input} Output: "),
+        "prompt_no_input": ("{instruction} Output: ")
 }
