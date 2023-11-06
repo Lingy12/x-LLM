@@ -77,7 +77,7 @@ torchrun --nproc_per_node=$NUM_PROC --master_port=$PORT \
     --per_device_train_batch_size "$MICRO_BATCH_SIZE" \
     --per_device_eval_batch_size "$MICRO_BATCH_SIZE" \
     --gradient_accumulation_steps $ACCUMULATION_STEP \
-    --lora_r 16\
+    --lora_r 64\
     --lora_alpha 16 \
     --lora_dropout 0.05 \
     --lora_target_modules "[q_proj, v_proj, k_proj, o_prof]" \
