@@ -38,10 +38,10 @@ case $BASE_MODEL in
 		MODEL_ARGS+=("--learning_rate 2e-5")
         FSDP="full_shard auto_wrap"
 		;;  
-	"llama-13b-hf")
-		MODEL_ARGS+=("--num_train_epochs 5")
+	"llama-2-13b-hf")
+		MODEL_ARGS+=("--num_train_epochs 3")
 		MODEL_ARGS+=("--learning_rate 1e-5")
-        FSDP="full_shard offload auto_wrap"
+        FSDP="full_shard auto_wrap"
 		;;  
 	"bloom-7b1")
 		MODEL_ARGS+=("--num_train_epochs 3")
