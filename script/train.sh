@@ -80,7 +80,7 @@ torchrun --nproc_per_node=$NUM_PROC --master_port=$PORT \
     --lora_r 64\
     --lora_alpha 16 \
     --lora_dropout 0.05 \
-    --lora_target_modules "[q_proj, v_proj, k_proj, o_prof]" \
+    --lora_target_modules "[q_proj, v_proj, k_proj, o_proj]" \
     --lora_bias 'none'\
     --lora_task '"CAUSAL_LM"'\
     --lr_scheduler_type "cosine" \
