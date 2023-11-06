@@ -235,6 +235,7 @@ def train():
     model = trainer.model
     model = model.merge_and_unload()
     model = model.save_pretrained(save_directory=training_args.output_dir)
+    tokenizer.save_pretrained(save_directory=training_args.output_dir)
     # trainer.save_model(output_dir=training_args.output_dir)
 
 
