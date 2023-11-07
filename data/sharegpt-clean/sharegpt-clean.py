@@ -81,6 +81,7 @@ class ShareGPT(datasets.GeneratorBasedBuilder):
         )
 
     def _split_generators(self, dl_manager):
+        print(os.path.join(self.base_path, f"sharegpt-clean_{self.config.lang}.json"))
         return [
             datasets.SplitGenerator(name=datasets.Split.TRAIN, gen_kwargs={"filepath": os.path.join(self.base_path, f"sharegpt-clean_{self.config.lang}.json")}),
         ]

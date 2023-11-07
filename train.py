@@ -136,7 +136,8 @@ class SupervisedDataset(Dataset):
             for example in list_data_dict
         ]
         targets = [f"{example['output']}{tokenizer.eos_token}" for example in list_data_dict]
-
+        
+        logging.warning('Generated {} samples.'.format(len(sources)))
         logging.warning("Tokenizing inputs... This may take some time...")
         data_dict = preprocess(sources, targets, tokenizer)
         logging.warning('Finished tokenization')
@@ -173,7 +174,6 @@ def make_supervised_data_module(tokenizer: transformers.PreTrainedTokenizer, pro
     """Make dataset and collator for supervised fine-tuning."""
     train_dataset = SupervisedDataset(tokenizer=tokenizer, prompt_name=prompt_name, data_path=data_args.data_path)
     data_collator = DataCollatorForSupervisedDataset(tokenizer=tokenizer)
-    logging.warning('Generated {} samples.'.format(len(train_dataset)))
     return dict(train_dataset=train_dataset, eval_dataset=None, data_collator=data_collator)
 
 
