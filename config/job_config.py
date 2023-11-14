@@ -31,7 +31,10 @@ sharegpt_clean_group = {
 alpaca_gpt4_group = {
     "base_model": ["llama-2-7b-hf"],
     "data": [
-          "alpaca-gpt4_en", 
+    "alpaca-gpt4_en",
+    "alpaca-gpt4_vi",
+    "alpaca-gpt4_zh",
+    "alpaca-gpt4_es", 
     "alpaca-gpt4_en+alpaca-gpt4_es",
     "alpaca-gpt4_en+alpaca-gpt4_zh",
     "alpaca-gpt4_en+alpaca-gpt4_vi",

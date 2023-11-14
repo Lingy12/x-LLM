@@ -36,7 +36,7 @@ MODEL_ARGS=()
 case $BASE_MODEL in  
 	"llama-2-7b-hf")
 		MODEL_ARGS+=("--num_train_epochs 3")
-		MODEL_ARGS+=("--learning_rate 2e-5")
+		MODEL_ARGS+=("--learning_rate 2e-4")
         FSDP="full_shard auto_wrap"
 		;;  
 	"llama-2-13b-hf")
