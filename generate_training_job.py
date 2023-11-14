@@ -14,7 +14,7 @@ def get_place_holder(template):
     placeholders = re.findall(r'{{(.*?)}}', template)
     return list(placeholders)
 
-def generate_jobs(data_group, dest_dir, gpu_num, home_path, xllm_path, project_name, wall_time=24):
+def generate_jobs(data_group, dest_dir, gpu_num, home_path, xllm_path, project_name, batch_size, wall_time=24):
     if not os.path.exists(dest_dir):
         os.mkdir(dest_dir)
     

@@ -33,7 +33,7 @@ echo "Virtual environment activated"
 #################################################
 cd {{script_dir}}
 
-bash script/train.sh {{model_name}} {{dataset_conf}} {{ngpu}} 2 128 {{prompt}} {{home_path}} {{xllm_path}} {{project_name}}
+bash script/train.sh {{model_name}} {{dataset_conf}} {{ngpu}} 2 {{batch_size}} {{prompt}} {{home_path}} {{xllm_path}} {{project_name}}
 #################################################
 #################################################
 echo "Finished"
