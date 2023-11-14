@@ -4,6 +4,11 @@ en_only_group = {
         "prompt": ["general_prompt_no_sys"]
         }
 
+debug = {
+    "base_model": ['llama-2-7b-hf'],
+    "data": ["alpaca_dbg"],
+    "prompt": ["general_prompt_no_sys"]
+}
 platypus_group = {
     "base_model": ["llama-2-7b-hf"],
     "data": [
