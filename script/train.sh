@@ -8,7 +8,7 @@ PROMPT_NAME=$6
 HOME_PATH=$7
 XLLM_PATH=$8
 PROJECT_NAME=$9
-LR=$10
+LR=${10}
 METHOD="finetune"
 # ensure number of CUDA_DEVICES is more than NUM_PROC
 # export CUDA_VISIBLE_DEVICES=$CUDA_DEVICES
@@ -18,6 +18,7 @@ ACCUMULATION_STEP=$(expr $MACRO_BATCH_SIZE / $MICRO_BATCH_SIZE / $NUM_PROC)
 echo "MICRO_BATCH_SIZE=$MICRO_BATCH_SIZE"
 echo "MACRO_BATCH_SIZE=$MACRO_BATCH_SIZE"
 echo "GRADIENT_ACCUMULATION_STEP=$ACCUMULATION_STEP"
+echo "LR=$LR"
 
 PORT=$(( $RANDOM % 1000 + 32768 ))
 CPFS_PATH=$HOME_PATH
@@ -32,6 +33,8 @@ export WANDB_NAME=$OUTPUT_NAME
 export WANDB_NOTES="FSDP on 4 A100 40"
 export WANDB_DIR="$CPFS_PATH/log"
 export WANDB_SERVICE_WAIT=300
+
+mkdir -p $PROJECT_PATH/model/$PROJECT_NAME
 
 MODEL_ARGS=()
 case $BASE_MODEL in  
@@ -74,7 +77,7 @@ torchrun --nproc_per_node=$NUM_PROC --master_port=$PORT \
 	${MODEL_ARGS[@]} \
     --data_path "$PROJECT_PATH/data/$DATASET" \
     --model_name_or_path "$PROJECT_PATH/model/$BASE_MODEL" \
-    --output_dir "$PROJECT_PATH/model/$OUTPUT_NAME" \
+    --output_dir "$PROJECT_PATH/model/$PROJECT_NAME/$OUTPUT_NAME" \
     --bf16 True \
     --per_device_train_batch_size "$MICRO_BATCH_SIZE" \
     --per_device_eval_batch_size "$MICRO_BATCH_SIZE" \
@@ -101,3 +104,4 @@ torchrun --nproc_per_node=$NUM_PROC --master_port=$PORT \
     --logging_dir "$CPFS_PATH/log/tensorboard/$OUTPUT_NAME" \
     --prompt_name "$PROMPT_NAME"
 
+echo "Saved model at $PROJECT_PATH/model/$PROJECT_NAME/$OUTPUT_NAME"
