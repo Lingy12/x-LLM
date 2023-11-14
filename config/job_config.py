@@ -48,6 +48,17 @@ alpaca_gpt4_group = {
     "prompt": ["general_prompt_no_sys"]
 }
 
+alpaca_gpt4_single_lang_group = {
+    "base_model": ["llama-2-7b-hf"],
+    "data": [
+    "alpaca-gpt4_en",
+    "alpaca-gpt4_vi",
+    "alpaca-gpt4_zh",
+    "alpaca-gpt4_es", 
+    ],
+    "prompt": ["general_prompt_no_sys"]
+}
+
 platypus_single_lang_group = {
     "base_model": ["llama-2-7b-hf"],
     "data": [

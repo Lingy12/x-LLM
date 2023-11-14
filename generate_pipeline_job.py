@@ -3,7 +3,7 @@ import fire
 from config import job_config
 import itertools
 import re
-TEMPLATE = './training_job_template.sh'
+TEMPLATE = './pipeline_job_template.sh'
 
 
 with open(TEMPLATE, 'r') as f:

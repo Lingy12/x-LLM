@@ -10,6 +10,11 @@ XLLM_PATH=$8
 PROJECT_NAME=$9
 LR=${10}
 METHOD="finetune"
+
+if [ "$NUM_PROC" -ne 1 ]; then
+  echo "This script only supports NUM_PROC being 1."
+  exit 1  # You can choose to exit the script with a non-zero status code if you want
+fi
 # ensure number of CUDA_DEVICES is more than NUM_PROC
 # export CUDA_VISIBLE_DEVICES=$CUDA_DEVICES
 
@@ -105,3 +110,37 @@ torchrun --nproc_per_node=$NUM_PROC --master_port=$PORT \
     --prompt_name "$PROMPT_NAME"
 
 echo "Saved model at $PROJECT_PATH/model/$PROJECT_NAME/$OUTPUT_NAME"
+
+echo "Start Eval..."
+cd ../seaeval_v1.0
+
+# =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =
+
+
+#####
+MODEL_NAME=$PROJECT_PATH/model/$PROJECT_NAME/$OUTPUT_NAME
+MODEL_BASE_NAME=$OUTPUT_NAME
+GPU=0
+BZ=1
+#####
+
+EVAL_MODE=hidden_test # public or hidden
+
+# =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =  =
+
+mkdir -p log/$EVAL_MODE/$MODEL_BASE_NAME
+
+
+for ((i=1; i<=5; i++))
+do
+
+    bash eval.sh cross_mmlu $MODEL_NAME $GPU $BZ $i $EVAL_MODE             2>&1 | tee log/$EVAL_MODE/$MODEL_BASE_NAME/cross_mmlu_p$i.log
+
+done
+
+for ((i=1; i<=5; i++))
+do
+
+    bash eval.sh cross_logiqa $MODEL_NAME $GPU $BZ $i $EVAL_MODE           2>&1 | tee log/$MODEL_NAME/cross_logiqa_p$i.log
+
+done
