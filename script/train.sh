@@ -8,7 +8,8 @@ PROMPT_NAME=$6
 HOME_PATH=$7
 XLLM_PATH=$8
 PROJECT_NAME=$9
-METHOD=${10:-"finetune"}
+LR=$10
+METHOD="finetune"
 # ensure number of CUDA_DEVICES is more than NUM_PROC
 # export CUDA_VISIBLE_DEVICES=$CUDA_DEVICES
 
@@ -21,7 +22,7 @@ echo "GRADIENT_ACCUMULATION_STEP=$ACCUMULATION_STEP"
 PORT=$(( $RANDOM % 1000 + 32768 ))
 CPFS_PATH=$HOME_PATH
 PROJECT_PATH=$CPFS_PATH/$XLLM_PATH
-OUTPUT_NAME=$BASE_MODEL.$DATASET.$METHOD.$PROMPT_NAME
+OUTPUT_NAME=$BASE_MODEL.$DATASET.$METHOD.$PROMPT_NAME.$LR.$MACRO_BATCH_SIZE
 FSDP_CONFIG=$PROJECT_PATH/fsdp_conf.json
 
 export HF_HOME=$CPFS_PATH/.cache/huggingface
@@ -36,7 +37,7 @@ MODEL_ARGS=()
 case $BASE_MODEL in  
 	"llama-2-7b-hf")
 		MODEL_ARGS+=("--num_train_epochs 3")
-		MODEL_ARGS+=("--learning_rate 2e-4")
+		MODEL_ARGS+=("--learning_rate $LR")
         FSDP="full_shard auto_wrap"
 		;;  
 	"llama-2-13b-hf")
