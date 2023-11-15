@@ -95,10 +95,10 @@ torchrun --nproc_per_node=$NUM_PROC --master_port=$PORT \
     --save_strategy "no" \
     --save_steps 2000 \
     --save_total_limit 1 \
-    --load_best_model_at_end True \
+    --load_best_model_at_end False \
     --model_max_length 4096\
     --optim "adamw_torch" \
-    --logging_steps 1 \
+    --logging_steps 10 \
     --report_to wandb tensorboard \
     --remove_unused_columns False \
     --logging_dir "$CPFS_PATH/log/tensorboard/$OUTPUT_NAME" \

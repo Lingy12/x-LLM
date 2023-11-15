@@ -14,7 +14,7 @@ single_expert_test = {
     "base_model": ["llama-2-7b-hf"],
     "data": [
           "platypus_zh", 
-          "alpaca-gpt4_zh"
+          "platypus_en"
     ],
     "prompt": ["general_prompt_no_sys"]
 }
