@@ -183,6 +183,7 @@ def train():
     model = transformers.AutoModelForCausalLM.from_pretrained(
         model_args.model_name_or_path,
         cache_dir=training_args.cache_dir,
+        use_cache=False,
         torch_dtype=torch.bfloat16 # add float 16 
     )
 
@@ -201,6 +202,7 @@ def train():
         model_max_length=training_args.model_max_length,
         padding_side="right",
         use_fast=False,
+        legacy=False
     )
     
     model = get_peft_model(model, config)

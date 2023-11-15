@@ -39,7 +39,7 @@ mkdir -p $PROJECT_PATH/model/$PROJECT_NAME
 MODEL_ARGS=()
 case $BASE_MODEL in  
 	"llama-2-7b-hf")
-		MODEL_ARGS+=("--num_train_epochs 3")
+		MODEL_ARGS+=("--num_train_epochs 5")
 		MODEL_ARGS+=("--learning_rate $LR")
         FSDP="full_shard auto_wrap"
 		;;  
@@ -96,7 +96,7 @@ torchrun --nproc_per_node=$NUM_PROC --master_port=$PORT \
     --save_steps 2000 \
     --save_total_limit 1 \
     --load_best_model_at_end True \
-    --model_max_length 512\
+    --model_max_length 4096\
     --optim "adamw_torch" \
     --logging_steps 1 \
     --report_to wandb tensorboard \
