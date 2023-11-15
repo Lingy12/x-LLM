@@ -39,7 +39,7 @@ mkdir -p $PROJECT_PATH/model/$PROJECT_NAME
 MODEL_ARGS=()
 case $BASE_MODEL in  
 	"llama-2-7b-hf")
-		MODEL_ARGS+=("--num_train_epochs 1")
+		MODEL_ARGS+=("--num_train_epochs 3")
 		MODEL_ARGS+=("--learning_rate $LR")
         FSDP="full_shard auto_wrap"
 		;;  
