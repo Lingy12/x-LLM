@@ -1,3 +1,4 @@
+export CUDA_VISIBLE_DEVICES=$4
 MODEL_NAME=$1
 DATASET=$2
 BATCH=${3:-8}
@@ -62,15 +63,16 @@ case $MODEL_NAME in
 		;;
 esac
 
-source $CPFS_PATH/miniconda3/bin/activate $PROJECT_PATH/.env
+# source $CPFS_PATH/miniconda3/bin/activate $PROJECT_PATH/.env
 
-mkdir -p "$PROJECT_PATH/model/$MODEL_NAME/test"
+MODEL_BASE_NAME=$(basename $MODEL_NAME)
+mkdir -p "$PROJECT_PATH/model/$MODEL_BASE_NAME/test"
 
 python \
     $PROJECT_PATH/inference.py \
     --data_path "$PROJECT_PATH/data/$DATASET" \
-    --model_name_or_path "$PROJECT_PATH/model/$MODEL_NAME" \
+    --model_name_or_path "$MODEL_NAME" \
 	${GEN_ARGS[@]} \
     --batch_size $BATCH \
-    --output_file "$PROJECT_PATH/model/$MODEL_NAME/test/$DATASET.inference.jsonl"
+    --output_file "$PROJECT_PATH/model/$MODEL_BASE_NAME/test/$DATASET.inference.jsonl"
     

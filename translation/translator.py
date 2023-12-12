@@ -13,6 +13,7 @@ def unpack_translation(translate_result):
         return list(map(lambda x: x.text, translate_result))
     else:
         return translate_result.text
+
 def translate_entry(args):
     entry, target = args
     success = False
@@ -24,7 +25,7 @@ def translate_entry(args):
             for key in entry.keys():
                 if len(entry[key]) == 0 or not entry[key]:
                     new_entry[key] = entry[key]
-                else:
+                else:        
                     new_entry[key] = unpack_translation(translator.translate(entry[key], dest=target))
             success = True
         except Exception as e:
@@ -38,9 +39,9 @@ def translate_entry(args):
 
     return new_entry
 
-def translate(source, target_lang, output_path, num_workers=4):
+def translate(source, target_lang, output_path, num_workers=16):
     with open(source, 'r') as f:
-        ds = json.load(f)
+        ds = json.load(f)[-100:]
 
     translated = []
     params = []

@@ -12,11 +12,22 @@ import copy
 
 from train import smart_tokenizer_and_embedding_resize, \
 	DEFAULT_PAD_TOKEN, DEFAULT_EOS_TOKEN, DEFAULT_BOS_TOKEN, DEFAULT_UNK_TOKEN, \
-	PROMPT_DICT, \
     DataArguments
 
 import train
 
+PROMPT_DICT = {
+    "prompt_input": (
+        "Below is an instruction that describes a task, paired with an input that provides further context. "
+        "Write a response that appropriately completes the request.\n\n"
+        "### Instruction:\n{instruction}\n\n### Input:\n{input}\n\n### Response:"
+    ),
+    "prompt_no_input": (
+        "Below is an instruction that describes a task. "
+        "Write a response that appropriately completes the request.\n\n"
+        "### Instruction:\n{instruction}\n\n### Response:"
+    ),
+}
 
 @dataclass
 class ModelArguments(train.ModelArguments):
@@ -125,6 +136,7 @@ def inference():
                 output_scores=True,
             )
         output = tokenizer.batch_decode(generation_output.sequences, skip_special_tokens=True)
+        # import pdb; pdb.set_trace()
         return dataset | {"prediction": [o[len(p):].strip() for p, o in zip(prompt, output)]}
     
     def evaluate_by_perplexity(
@@ -226,7 +238,6 @@ def inference():
                     for sample in d["original_input"]
                 ]
             ## ? translate input
-
             if generating_args.evaluate == "generate":
                 output = evaluate_by_generate(d, template=generating_args.template, generation_config=generation_config)
             elif generating_args.evaluate == "perplexity":
